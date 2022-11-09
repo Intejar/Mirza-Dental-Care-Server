@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
 const port = process.env.PORT || 5000;
@@ -18,6 +18,7 @@ async function run(){
     
     try{
         const serviceCollection = client.db('DrMirza').collection('service')
+        const reviewCollection = client.db('DrMirza').collection('review')
         app.get('/service', async(req, res)=>{
             const query = {};
             const cursor = serviceCollection.find(query).limit(3);
@@ -30,6 +31,25 @@ async function run(){
             const services = await cursor.toArray();
             res.send(services);
         })
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const service = await serviceCollection.findOne(query)
+            res.send(service)
+        })
+        app.get('/review', async(req, res)=>{
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const services = await cursor.toArray();
+            res.send(services);
+        })
+        app.post('/review', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne({review, dateAdded: new Date()})
+            res.send(result)
+        })
+
+
 
     }
     finally{
