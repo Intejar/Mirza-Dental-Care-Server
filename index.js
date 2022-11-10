@@ -38,14 +38,25 @@ async function run(){
             res.send(service)
         })
         app.get('/review', async(req, res)=>{
-            const query = {};
-            const cursor = reviewCollection.find(query);
-            const services = await cursor.toArray();
-            res.send(services);
+            let query = {};
+            if(req.query.email){
+                query = {
+                    email : req.query.email
+                }
+            }
+            const cursor = reviewCollection.find(query).sort({dateAdded : -1});
+            const review = await cursor.toArray();
+            res.send(review);
         })
         app.post('/review', async (req, res) => {
             const review = req.body;
             const result = await reviewCollection.insertOne({review, dateAdded: new Date()})
+            res.send(result)
+        })
+        app.delete('/review/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const result = await reviewCollection.deleteOne(query)
             res.send(result)
         })
 
