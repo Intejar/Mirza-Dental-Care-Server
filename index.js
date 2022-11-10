@@ -68,9 +68,9 @@ async function run(){
         })
         app.get('/userservices', async(req, res)=>{
             let query = {};
-            if(req.query.userEmail){
+            if(req.query.email){
                 query = {
-                    userEmail : req.query.userEmail
+                    email : req.query.email
                 }
             }
             const cursor = userServiceCollection.find(query);
