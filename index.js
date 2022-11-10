@@ -44,13 +44,26 @@ async function run(){
                     email : req.query.email
                 }
             }
-            const cursor = reviewCollection.find(query).sort({dateAdded : -1});
+            const cursor = reviewCollection.find(query).sort({date : -1});
             const review = await cursor.toArray();
             res.send(review);
         })
         app.post('/review', async (req, res) => {
             const review = req.body;
-            const result = await reviewCollection.insertOne({review, dateAdded: new Date()})
+            review.date = new Date()
+            const result = await reviewCollection.insertOne(review)
+            res.send(result)
+        })
+        app.patch('/review/:id', async (req, res) => {
+            const id = req.params.id;
+            const edited = req.body.comment
+            const query = { _id: ObjectId(id) };
+            const updatedDoc = {
+                $set: {
+                    comment: edited
+                }
+            }
+            const result = await reviewCollection.updateOne(query, updatedDoc);
             res.send(result)
         })
         app.delete('/review/:id', async (req, res) => {
